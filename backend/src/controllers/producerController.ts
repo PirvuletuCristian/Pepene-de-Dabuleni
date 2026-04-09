@@ -1,7 +1,8 @@
 import { pool } from "../config/database.js";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
+import { logger } from "../utils/logger.js";
 
-export const createProducer = async (req: Request, res: Response) => {
+export const createProducer = async (req: Request, res: Response, next: NextFunction) => {
     const { name, product, latitude, longitude } = req.body;
     try {
         const result = await pool.query(
@@ -10,10 +11,11 @@ export const createProducer = async (req: Request, res: Response) => {
             RETURNING *`,
             [name, product, longitude, latitude]
         );
+        logger.info(`Producer created: ${name}`);
         res.status(201).json(result.rows[0]);
     } catch (err) {
-        console.error("Database error:", err);
-        res.status(500).json({ error: "Failed to add producer" });
+        logger.error("Failed to create producer:", err);
+        next(err);
     }
 };
 
@@ -26,9 +28,10 @@ export const getProducers = async (_: Request, res: Response) => {
                 created_at
             FROM producers`
         );
+        logger.info(`Fetched ${result.rows.length} producers`);
         res.json(result.rows);
     } catch (err) {
-        console.error("Database error:", err);
+        logger.error("Failed to fetch producers:", err);
         res.status(500).json({ error: "Failed to fetch producers" })
     }
 };
