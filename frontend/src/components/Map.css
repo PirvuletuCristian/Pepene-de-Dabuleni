@@ -1,0 +1,14 @@
+.map-container {
+  height: 100%;
+  width: 100%;
+}
+
+.popup-content h3 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+}
+
+.popup-content p {
+  margin: 5px 0;
+  font-size: 14px;
+}

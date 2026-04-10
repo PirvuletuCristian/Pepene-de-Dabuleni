@@ -1,0 +1,46 @@
+.producer-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.producer-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  background-color: #f9f9f9;
+}
+
+.producer-card.selected {
+  border: 2px solid #4CAF50;
+  background-color: #e8f5e9;
+  box-shadow: 0 4px 16px rgba(76, 175, 80, 0.3);
+}
+
+.producer-card.selected:hover {
+  transform: translateY(-4px);
+  background-color: #e8f5e9;
+}
+
+/* Tablets & Medium */
+@media (max-width: 900px) {
+  .producer-card {
+    border-radius: 6px;
+    margin-bottom: 8px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .producer-card {
+    border-radius: 6px;
+    margin-bottom: 6px;
+  }
+
+  .producer-card:hover {
+    transform: none;
+  }
+
+  .producer-card.selected:hover {
+    transform: none;
+  }
+}
