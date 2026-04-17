@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { createProducer, getProducers, deleteProducer } from "../controllers/producerController.js";
-import { validateProducer } from "../middleware/validation.js";
+import { createProducer, getProducers, deleteProducer } from "../controllers/producerController.ts";
+import { validateProducer } from "../middleware/validation.ts";
 
 const router = Router();
 

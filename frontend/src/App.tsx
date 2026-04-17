@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Container, Paper, Typography, CircularProgress, Alert } from "@mui/material";
+import { Box, Container, Typography, CircularProgress, Alert } from "@mui/material";
 import { getProducers, Producer, deleteProducer } from "./services/api";
 import Map from "./components/Map";
 import SearchBar from "./components/SearchBar";
@@ -68,10 +68,10 @@ function App() {
     <Box className="app-container">
       <Box className="header">
         <Typography variant="h3" component="h1" sx={{ color: "white" }}>
-          🍉 Local Watermelon Producers
+          🍉 Pepene de Dabuleni 🍉
         </Typography>
         <Typography variant="subtitle1" sx={{ color: "rgba(255,255,255,0.8)" }}>
-          Find fresh, locally-grown watermelons near you
+          Afla unde poti gasi adevaratii pepeni de Dabuleni
         </Typography>
       </Box>
 

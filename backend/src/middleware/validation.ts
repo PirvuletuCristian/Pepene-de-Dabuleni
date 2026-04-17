@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from "express";
-import { logger } from "../utils/logger.js";
-import { producerSchema } from "../validators/producerValidator.js";
+import type { Request, Response, NextFunction } from "express";
+import { logger } from "../utils/logger.ts";
+import { producerSchema } from "../validators/producerValidator.ts";
 
 export function validateProducer(req: Request, res: Response, next: NextFunction) {
     try {

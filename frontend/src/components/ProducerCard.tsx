@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardActions, Button, Typography, Box } from "@mui/material";
 import { Producer } from "../services/api";
+import { getCityFromCoordinates } from "../utils/geocoding";
 import "./ProducerCard.css";
 
 interface ProducerCardProps {
@@ -11,6 +12,16 @@ interface ProducerCardProps {
 }
 
 const ProducerCard: React.FC<ProducerCardProps> = ({ producer, isSelected, onDelete, onClick }) => {
+  const [city, setCity] = useState<string>("Loading...");
+
+  useEffect(() => {
+    const fetchCity = async () => {
+      const cityName = await getCityFromCoordinates(producer.latitude, producer.longitude);
+      setCity(cityName);
+    };
+    fetchCity();
+  }, [producer.latitude, producer.longitude]);
+
   return (
     <Card 
       className={`producer-card ${isSelected ? "selected" : ""}`}
@@ -30,7 +41,7 @@ const ProducerCard: React.FC<ProducerCardProps> = ({ producer, isSelected, onDel
         </Typography>
         <Box sx={{ marginTop: "10px", fontSize: "12px" }}>
           <Typography variant="body2">
-            <strong>Location:</strong> {producer.latitude.toFixed(4)}, {producer.longitude.toFixed(4)}
+            <strong>Location:</strong> {city}
           </Typography>
           <Typography variant="body2">
             <strong>Created:</strong> {new Date(producer.created_at).toLocaleDateString()}

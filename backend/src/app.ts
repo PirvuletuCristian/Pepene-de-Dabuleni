@@ -3,8 +3,8 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import dotenv from "dotenv";
-import producersRouter from "./routes/producers.js"
-import { errorHandler } from "./middleware/errorHandler.js";
+import producersRouter from "./routes/producers.ts"
+import { errorHandler } from "./middleware/errorHandler.ts";
 
 dotenv.config();
 

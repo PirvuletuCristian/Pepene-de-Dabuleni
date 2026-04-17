@@ -84,9 +84,6 @@ const Map: React.FC<MapProps> = ({ producers, selectedProducer, onMarkerClick })
               <p>
                 <strong>Product:</strong> {producer.product}
               </p>
-              <p>
-                <strong>Location:</strong> {producer.latitude.toFixed(4)}, {producer.longitude.toFixed(4)}
-              </p>
             </div>
           </Popup>
         </Marker>
