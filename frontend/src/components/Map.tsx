@@ -82,7 +82,7 @@ const Map: React.FC<MapProps> = ({ producers, selectedProducer, onMarkerClick })
             <div className="popup-content">
               <h3>{producer.name}</h3>
               <p>
-                <strong>Product:</strong> {producer.product}
+                <strong>Produs:</strong> {producer.product}
               </p>
             </div>
           </Popup>

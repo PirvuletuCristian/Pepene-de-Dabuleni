@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, Container, Typography, CircularProgress, Alert } from "@mui/material";
-import { getProducers, Producer, deleteProducer } from "./services/api";
+import { getProducers, Producer } from "./services/api";
 import Map from "./components/Map";
 import SearchBar from "./components/SearchBar";
 import ProducerCard from "./components/ProducerCard";
@@ -21,7 +21,7 @@ function App() {
         setFilteredProducers(data);
         setLoading(false);
       } catch (err) {
-        setError("Failed to load producers. Please try again later.");
+        setError("Nu s-au putut încărca producătorii. Vă rugăm să încercați din nou mai târziu.");
         setLoading(false);
         console.error(err);
       }
@@ -44,17 +44,7 @@ function App() {
     setSelectedProducer(undefined);
   };
 
-  const handleDeleteProducer = async (id: number) => {
-    try {
-      await deleteProducer(id);
-      const updated = producers.filter((p) => p.id !== id);
-      setProducers(updated);
-      setFilteredProducers(updated.filter((p) => filteredProducers.find((fp) => fp.id === p.id)));
-      setSelectedProducer(undefined);
-    } catch (err) {
-      console.error("Failed to delete producer:", err);
-    }
-  };
+
 
   if (loading) {
     return (
@@ -94,10 +84,10 @@ function App() {
           />
 
           <Typography variant="h6" sx={{ marginTop: "20px" }}>
-            All Producers ({filteredProducers.length})
+            Toți producătorii ({filteredProducers.length})
           </Typography>
           <Typography variant="body2" color="textSecondary" sx={{ marginBottom: "10px" }}>
-            Click on a marker to view producer details
+            Faceți clic pe un marker pentru a vedea detaliile producătorului
           </Typography>
 
           <Box className="producers-list">
@@ -108,11 +98,10 @@ function App() {
                   producer={producer}
                   isSelected={selectedProducer?.id === producer.id}
                   onClick={setSelectedProducer}
-                  onDelete={handleDeleteProducer}
                 />
               ))
             ) : (
-              <Typography color="textSecondary">No producers found</Typography>
+              <Typography color="textSecondary">Niciun producător găsit</Typography>
             )}
           </Box>
         </Box>

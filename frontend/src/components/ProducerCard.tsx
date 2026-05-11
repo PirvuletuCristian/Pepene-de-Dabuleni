@@ -12,7 +12,7 @@ interface ProducerCardProps {
 }
 
 const ProducerCard: React.FC<ProducerCardProps> = ({ producer, isSelected, onDelete, onClick }) => {
-  const [city, setCity] = useState<string>("Loading...");
+  const [city, setCity] = useState<string>("Se încarcă...");
 
   useEffect(() => {
     const fetchCity = async () => {
@@ -41,10 +41,10 @@ const ProducerCard: React.FC<ProducerCardProps> = ({ producer, isSelected, onDel
         </Typography>
         <Box sx={{ marginTop: "10px", fontSize: "12px" }}>
           <Typography variant="body2">
-            <strong>Location:</strong> {city}
+            <strong>Locație:</strong> {city}
           </Typography>
           <Typography variant="body2">
-            <strong>Created:</strong> {new Date(producer.created_at).toLocaleDateString()}
+            <strong>Creat:</strong> {new Date(producer.created_at).toLocaleDateString()}
           </Typography>
         </Box>
       </CardContent>
@@ -55,7 +55,7 @@ const ProducerCard: React.FC<ProducerCardProps> = ({ producer, isSelected, onDel
             color="error"
             onClick={() => onDelete(producer.id)}
           >
-            Delete
+            Ștergere
           </Button>
         )}
       </CardActions>

@@ -16,6 +16,7 @@ const apiClient = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true,
 });
 
 export const getProducers = async (): Promise<Producer[]> => {
@@ -28,8 +29,28 @@ export const createProducer = async (producer: Omit<Producer, "id" | "created_at
   return response.data;
 };
 
+export const updateProducer = async (id: number, producer: Omit<Producer, "id" | "created_at">) => {
+  const response = await apiClient.put(`/producers/${id}`, producer);
+  return response.data;
+};
+
 export const deleteProducer = async (id: number) => {
   const response = await apiClient.delete(`/producers/${id}`);
+  return response.data;
+};
+
+export const login = async (username: string, password: string) => {
+  const response = await apiClient.post("/auth/login", { username, password });
+  return response.data;
+};
+
+export const logout = async () => {
+  const response = await apiClient.post("/auth/logout");
+  return response.data;
+};
+
+export const checkAuth = async () => {
+  const response = await apiClient.get("/auth/check");
   return response.data;
 };
 

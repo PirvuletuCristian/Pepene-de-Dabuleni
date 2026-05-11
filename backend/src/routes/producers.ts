@@ -1,11 +1,13 @@
 import { Router } from "express";
-import { createProducer, getProducers, deleteProducer } from "../controllers/producerController.ts";
+import { createProducer, getProducers, deleteProducer, updateProducer } from "../controllers/producerController.ts";
 import { validateProducer } from "../middleware/validation.ts";
+import { requireAuth } from "../middleware/auth.ts";
 
 const router = Router();
 
-router.post("/", validateProducer, createProducer);
 router.get("/", getProducers);
-router.delete("/:id", deleteProducer);
+router.post("/", requireAuth, validateProducer, createProducer);
+router.put("/:id", requireAuth, validateProducer, updateProducer);
+router.delete("/:id", requireAuth, deleteProducer);
 
 export default router;
