@@ -19,7 +19,7 @@ export const createProducer = async (req: Request, res: Response, next: NextFunc
     }
 };
 
-export const getProducers = async (_: Request, res: Response) => {
+export const getProducers = async (_: Request, res: Response, next: NextFunction) => {
     try {
         const result = await pool.query(
             `SELECT id, name, product,
@@ -32,7 +32,7 @@ export const getProducers = async (_: Request, res: Response) => {
         res.json(result.rows);
     } catch (err) {
         logger.error("Failed to fetch producers:", err);
-        res.status(500).json({ error: "Failed to fetch producers" })
+        next(err);
     }
 };
 
@@ -41,8 +41,8 @@ export const deleteProducer = async (req: Request, res: Response, next: NextFunc
 
     //Validate producedID
     if (!producerId || isNaN(producerId) || producerId <= 0) {
-        return 
         res.status(400).json({ error: "Invalid producer ID" });
+        return;
     }
 
     try {

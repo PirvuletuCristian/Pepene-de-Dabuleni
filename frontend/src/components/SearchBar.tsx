@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TextField, Box, Button, CircularProgress } from "@mui/material";
+import { TextField, Box, Button, CircularProgress, Alert } from "@mui/material";
 import { ExpandMore as ExpandMoreIcon, ExpandLess as ExpandLessIcon, MyLocation as MyLocationIcon, Clear as ClearIcon } from "@mui/icons-material";
 import { Producer } from "../services/api";
 import "./SearchBar.css";
@@ -21,12 +21,14 @@ interface SearchBarProps {
   producers: Producer[];
   onLocationSearch: (producer: Producer | undefined) => void;
   onProductFilter: (filteredProducers: Producer[]) => void;
+  onUserLocation: (coords: { lat: number; lon: number } | null) => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
   producers,
   onLocationSearch,
   onProductFilter,
+  onUserLocation,
 }) => {
   const [productQuery, setProductQuery] = useState("");
   const [producerQuery, setProducerQuery] = useState("");
@@ -34,6 +36,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [locating, setLocating] = useState(false);
   const [radius, setRadius] = useState<string>("30");
   const [userCoords, setUserCoords] = useState<{ lat: number; lon: number } | null>(null);
+  const [noResults, setNoResults] = useState(false);
 
   const applyFilters = (
     coords: { lat: number; lon: number } | null,
@@ -58,6 +61,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
       );
     }
     onProductFilter(result);
+    setNoResults(result.length === 0);
   };
 
   const handleUseMyLocation = () => {
@@ -71,17 +75,41 @@ const SearchBar: React.FC<SearchBarProps> = ({
       return;
     }
     setLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setLocating(false);
-        const coords = { lat: position.coords.latitude, lon: position.coords.longitude };
-        setUserCoords(coords);
-        applyFilters(coords, productQuery, producerQuery, km);
-      },
-      () => {
-        setLocating(false);
+
+    let watchId: number;
+    let bestPosition: GeolocationPosition | null = null;
+    let done = false;
+
+    // Accept the position and clean up
+    const finish = (pos: GeolocationPosition | null) => {
+      if (done) return;
+      done = true;
+      clearTimeout(fallbackTimer);
+      navigator.geolocation.clearWatch(watchId);
+      setLocating(false);
+      if (!pos) {
         alert("Nu s-a putut determina locația dvs.");
+        return;
       }
+      const coords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+      setUserCoords(coords);
+      onUserLocation(coords);
+      applyFilters(coords, productQuery, producerQuery, km);
+    };
+
+    // After 15s fall back to the best reading we have (even if imprecise)
+    const fallbackTimer = setTimeout(() => finish(bestPosition), 15000);
+
+    // watchPosition keeps refining the fix; accept as soon as accuracy ≤ 3 km
+    watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        bestPosition = position;
+        if (position.coords.accuracy <= 3000) {
+          finish(position);
+        }
+      },
+      () => finish(null),
+      { maximumAge: 0, enableHighAccuracy: true }
     );
   };
 
@@ -191,8 +219,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
             setProductQuery("");
             setProducerQuery("");
             setUserCoords(null);
+            setNoResults(false);
             onProductFilter(producers);
             onLocationSearch(undefined);
+            onUserLocation(null);
           }}
           startIcon={<ClearIcon />}
           fullWidth
@@ -206,6 +236,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
           Resetează filtrele
         </Button>
       </Box>
+
+      {noResults && (
+        <Alert severity="warning" sx={{ mt: 1 }} onClose={() => setNoResults(false)}>
+          Niciun producător găsit pentru filtrele aplicate.
+        </Alert>
+      )}
     </Box>
   );
 };

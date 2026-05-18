@@ -31,10 +31,9 @@ import {
   createProducer,
   updateProducer,
   deleteProducer,
-  logout,
-  checkAuth,
   Producer,
 } from "../services/api";
+import { useAuth } from "../context/AuthContext";
 import AdminMap from "../components/AdminMap";
 
 interface ProducerFormData {
@@ -58,23 +57,16 @@ const AdminDashboard: React.FC = () => {
   const [deletingProducer, setDeletingProducer] = useState<Producer | null>(null);
   const [form, setForm] = useState<ProducerFormData>(emptyForm);
   const navigate = useNavigate();
+  const { authenticated, loading: authLoading, signOut } = useAuth();
 
   useEffect(() => {
-    const verifyAuth = async () => {
-      try {
-        const result = await checkAuth();
-        if (!result.authenticated) {
-          navigate("/admin");
-          return;
-        }
-      } catch {
-        navigate("/admin");
-        return;
-      }
-      fetchProducers();
-    };
-    verifyAuth();
-  }, [navigate]);
+    if (authLoading) return;
+    if (!authenticated) {
+      navigate("/admin");
+      return;
+    }
+    fetchProducers();
+  }, [authenticated, authLoading, navigate]);
 
   const fetchProducers = async () => {
     try {
@@ -90,11 +82,11 @@ const AdminDashboard: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      await logout();
-      navigate("/admin");
+      await signOut();
     } catch {
-      navigate("/admin");
+      // signOut clears state regardless; navigation handled by auth effect
     }
+    navigate("/admin");
   };
 
   const openAddDialog = (lat?: number, lng?: number) => {

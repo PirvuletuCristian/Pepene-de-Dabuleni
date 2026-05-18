@@ -10,6 +10,7 @@ function App() {
   const [producers, setProducers] = useState<Producer[]>([]);
   const [filteredProducers, setFilteredProducers] = useState<Producer[]>([]);
   const [selectedProducer, setSelectedProducer] = useState<Producer | undefined>();
+  const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -73,6 +74,7 @@ function App() {
             producers={filteredProducers}
             selectedProducer={selectedProducer}
             onMarkerClick={setSelectedProducer}
+            userLocation={userLocation}
           />
         </Box>
 
@@ -81,6 +83,7 @@ function App() {
             producers={producers}
             onLocationSearch={handleLocationSearch}
             onProductFilter={handleProductFilter}
+            onUserLocation={setUserLocation}
           />
 
           <Typography variant="h6" sx={{ marginTop: "20px" }}>

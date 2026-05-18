@@ -12,6 +12,10 @@ import { pool } from "./config/database.ts";
 
 dotenv.config();
 
+if (!process.env.SESSION_SECRET) {
+    throw new Error("SESSION_SECRET environment variable is required");
+}
+
 const PgSession = connectPgSimple(session);
 
 const app = express();
@@ -21,7 +25,7 @@ app.use(cors({
     credentials: true,
 }));
 app.use(helmet());
-app.use(morgan("dev"));
+app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 app.use(express.json());
 
 app.use(session({
@@ -29,7 +33,7 @@ app.use(session({
         pool: pool,
         tableName: "session",
     }),
-    secret: process.env.SESSION_SECRET || "pepene-secret-change-me",
+    secret: process.env.SESSION_SECRET as string,
     resave: false,
     saveUninitialized: false,
     cookie: {

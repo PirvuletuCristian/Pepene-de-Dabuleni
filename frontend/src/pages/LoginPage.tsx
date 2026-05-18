@@ -8,7 +8,7 @@ import {
   Paper,
   Alert,
 } from "@mui/material";
-import { login } from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -16,6 +16,7 @@ const LoginPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { signIn } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +24,7 @@ const LoginPage: React.FC = () => {
     setLoading(true);
 
     try {
-      await login(username, password);
+      await signIn(username, password);
       navigate("/admin/dashboard");
     } catch (err: any) {
       setError(err.response?.data?.error || "Autentificare eșuată. Vă rugăm să încercați din nou.");

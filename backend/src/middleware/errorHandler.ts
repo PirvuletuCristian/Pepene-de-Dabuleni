@@ -7,11 +7,13 @@ export function errorHandler(err: any, req: Request, res: Response, next: NextFu
     //Custom error with status
     if (err.status) {
         res.status(err.status).json({ error: err.message });
+        return;
     }
 
     //Zod validation error
     if (err.errors && Array.isArray(err.errors)) {
         res.status(400).json({ error: "Validation failed", details: err.errors });
+        return;
     }
 
     //Default to 500
