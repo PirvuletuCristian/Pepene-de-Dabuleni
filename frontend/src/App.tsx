@@ -62,7 +62,7 @@ function App() {
           🍉 Pepene de Dabuleni 🍉
         </Typography>
         <Typography variant="subtitle1" sx={{ color: "rgba(255,255,255,0.8)" }}>
-          Afla unde poti gasi adevaratii pepeni de Dabuleni
+          Află unde poți găsi adevărații pepeni de Dabuleni
         </Typography>
       </Box>
 
