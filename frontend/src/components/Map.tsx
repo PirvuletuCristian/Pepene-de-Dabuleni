@@ -16,19 +16,39 @@ const MapController: React.FC<MapControllerProps> = ({ selectedProducer, markerR
   const map = useMap();
 
   useEffect(() => {
-    if (selectedProducer) {
-      map.setView(
-        [selectedProducer.latitude, selectedProducer.longitude],
-        13,
-        { animate: true }
-      );
+    if (!selectedProducer) return;
 
-      // Open the popup for the selected producer
-      const marker = markerRefs.current[selectedProducer.id];
-      if (marker) {
-        marker.openPopup();
-      }
-    }
+    let timer: number | undefined;
+
+    // Open the popup once the map has finished moving, but outside Leaflet's own
+    // event dispatch: a popup's _adjustPan stops the pan animation (which fires
+    // "moveend"), and closing/reopening that popup at that moment leaves it
+    // without a map and crashes.
+    const openPopup = () => {
+      timer = window.setTimeout(() => {
+        const marker = markerRefs.current[selectedProducer.id];
+        if (marker && !marker.isPopupOpen()) {
+          marker.openPopup();
+        }
+      }, 0);
+    };
+
+    // Close the popup that is still open first: react-leaflet re-runs
+    // popup.update() on every render while it is open, and its autoPan cancels
+    // the setView animation below.
+    map.closePopup();
+    map.stop();
+    map.once("moveend", openPopup);
+    map.setView(
+      [selectedProducer.latitude, selectedProducer.longitude],
+      13,
+      { animate: true }
+    );
+
+    return () => {
+      map.off("moveend", openPopup);
+      window.clearTimeout(timer);
+    };
   }, [selectedProducer, map, markerRefs]);
 
   useEffect(() => {

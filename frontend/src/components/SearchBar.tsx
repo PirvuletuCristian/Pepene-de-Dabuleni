@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { TextField, Box, Button, CircularProgress, Alert } from "@mui/material";
 import { ExpandMore as ExpandMoreIcon, ExpandLess as ExpandLessIcon, MyLocation as MyLocationIcon, Clear as ClearIcon } from "@mui/icons-material";
 import { Producer } from "../services/api";
@@ -16,6 +16,10 @@ const haversineKm = (lat1: number, lon1: number, lat2: number, lon2: number): nu
       Math.sin(dLon / 2);
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 };
+
+// Case- and diacritic-insensitive text for matching ("Dăbuleni" matches "dabuleni")
+const normalizeText = (s: string): string =>
+  s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
 interface SearchBarProps {
   producers: Producer[];
@@ -38,6 +42,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [userCoords, setUserCoords] = useState<{ lat: number; lon: number } | null>(null);
   const [noResults, setNoResults] = useState(false);
 
+  // Always holds the latest typed queries, so the asynchronous geolocation
+  // callback does not use the values from when the button was clicked.
+  const latestQueries = useRef({ product: "", producer: "" });
+  latestQueries.current = { product: productQuery, producer: producerQuery };
+
   const applyFilters = (
     coords: { lat: number; lon: number } | null,
     product: string,
@@ -51,14 +60,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
       );
     }
     if (product.trim()) {
-      result = result.filter((p) =>
-        p.product.toLowerCase().includes(product.toLowerCase())
-      );
+      const needle = normalizeText(product.trim());
+      result = result.filter((p) => normalizeText(p.product).includes(needle));
     }
     if (producer.trim()) {
-      result = result.filter((p) =>
-        p.name.toLowerCase().includes(producer.toLowerCase())
-      );
+      const needle = normalizeText(producer.trim());
+      result = result.filter((p) => normalizeText(p.name).includes(needle));
     }
     onProductFilter(result);
     setNoResults(result.length === 0);
@@ -94,7 +101,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
       const coords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
       setUserCoords(coords);
       onUserLocation(coords);
-      applyFilters(coords, productQuery, producerQuery, km);
+      applyFilters(
+        coords,
+        latestQueries.current.product,
+        latestQueries.current.producer,
+        km
+      );
     };
 
     // After 15s fall back to the best reading we have (even if imprecise)
